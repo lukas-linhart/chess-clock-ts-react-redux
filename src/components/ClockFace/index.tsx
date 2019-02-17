@@ -1,8 +1,10 @@
 import React from 'react';
+import ClockDial from './ClockDial';
 
 const ClockFace = () => (
   <div>
-    chess clock
+    <ClockDial />
+    <ClockDial />
   </div>
 );
 
