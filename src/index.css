@@ -38,6 +38,10 @@ code {
   user-select: none;
 }
 
+.clockDial.inactive {
+  background-color: rgb(128, 128, 128);
+}
+
 @media (orientation: landscape) {
   .clockFace {
     grid-template-columns: 2vw [p1-start] 3fr [btn-start] 2fr [p1-end] 6vw [p2-start] 2fr [btn-end] 3fr [p2-end] 2vw;
