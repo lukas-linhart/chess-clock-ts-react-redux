@@ -1,8 +1,9 @@
 import React from 'react';
+import ClockFace from '../ClockFace';
 
 const App = () => (
   <div className="App">
-    chess clock
+    <ClockFace />
   </div>
 );
 
