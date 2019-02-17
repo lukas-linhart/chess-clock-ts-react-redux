@@ -1,8 +1,8 @@
 import React from 'react';
 
-const ClockDial = () => (
-  <div>
-    clock dial
+const ClockDial = ({ player }) => (
+  <div className="clockDial" id={player}>
+    {player}
   </div>
 );
 

@@ -12,3 +12,69 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.App {
+  background-color: rgb(96, 96, 96);
+  width: 100vw;
+  height: 100vh;
+  font-family: sans-serif;
+}
+
+.clockFace {
+  background-color: rgb(96, 96, 96);
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  transition: all 0.1s linear;
+}
+
+.clockDial {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 0 0.5em 0 rgba(0, 0, 0, 0.5);
+  color: black;
+  user-select: none;
+}
+
+@media (orientation: landscape) {
+  .clockFace {
+    grid-template-columns: 2vw [p1-start] 3fr [btn-start] 2fr [p1-end] 6vw [p2-start] 2fr [btn-end] 3fr [p2-end] 2vw;
+    grid-template-rows: 2vw [btn-start] 2fr [btn-end] 2vw [p1-start p2-start] 3fr [p1-end p2-end] 2vw;
+  }
+
+  .clockDial {
+    border-radius: 0.5vw;
+    font-size: 10vw;
+  }
+
+  #player1 {
+    grid-area: p1;
+  }
+
+  #player2 {
+    grid-area: p2;
+  }
+}
+
+@media (orientation: portrait) {
+  .clockFace {
+    grid-template-columns: 5vh [p1-start p2-start btn-start] 1fr [p1-end p2-end btn-end] 5vh;
+    grid-template-rows: 5vh [p2-start] 2fr [p2-end] 5vh [btn-start] 1fr [btn-end] 5vh [p1-start] 2fr [p1-end] 5vh;
+  }
+
+  .clockDial {
+    border-radius: 1vh;
+    font-size: 12vh;
+  }
+
+  #player1 {
+    grid-area: p1;
+  }
+
+  #player2 {
+    grid-area: p2;
+    transform: rotate(180deg);
+  }
+}
