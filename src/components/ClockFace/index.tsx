@@ -1,11 +1,11 @@
 import React from 'react';
 import ClockDial from './ClockDial';
-import { players } from '../../constants';
+import { players } from '../../types';
 
 const ClockFace = () => (
   <div className="clockFace">
     {players.map(player =>
-      <ClockDial key={player} player={player} state="inactive" />
+      <ClockDial key={player} player={player} />
     )}
   </div>
 );

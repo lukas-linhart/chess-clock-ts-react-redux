@@ -18,6 +18,7 @@ code {
   width: 100vw;
   height: 100vh;
   font-family: sans-serif;
+  overflow: hidden;
 }
 
 .clockFace {
@@ -40,6 +41,10 @@ code {
 
 .clockDial.inactive {
   background-color: rgb(128, 128, 128);
+}
+
+.clockDial.active {
+  background-color: rgb(0, 255, 204);
 }
 
 @media (orientation: landscape) {
