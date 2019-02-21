@@ -2,7 +2,8 @@ import React from 'react';
 import { Player } from '../../../types';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { State, playerToMove$, playerTime$ } from '../../../store';
+import { playerToMove$, playersTime$ } from '../../../store';
+import { State } from '../../../store/state';
 import { toggleClock } from '../../../store/actions';
 import { formattedTime } from '../../../helpers';
 
@@ -38,7 +39,7 @@ const mapState = (state: State, ownProps: OwnProps): StateProps => {
   const playerToMove = playerToMove$(state);
   return {
     state: (player !== playerToMove) ? 'inactive' : 'active',
-    time: playerTime$(state, player),
+    time: playersTime$(state, player),
   };
 }
 
