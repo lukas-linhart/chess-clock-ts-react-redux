@@ -1,10 +1,11 @@
 import { Player } from '../types';
 
-export type ClockState = 'initial' | 'running';
+export type ClockState = { run: 'initial' }
+  | { run: 'running', playerToMove: Player }
+  | { run: 'ended', playerToMove: Player };
 
 export type State = {
   clock: ClockState,
-  playerToMove: Player | null,
   previousTime: number,
   time: {
     player1: number,
@@ -13,8 +14,7 @@ export type State = {
 };
 
 export const initialState: State = {
-  clock: 'initial',
-  playerToMove: null,
+  clock: { run: 'initial' },
   previousTime: 0,
   time: {
     player1: 5000,

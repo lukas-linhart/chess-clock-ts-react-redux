@@ -5,29 +5,56 @@ import { actionTypes } from './actions';
 import { Player } from '../types';
 
 
-const newTime = (state: State, player: Player, timestamp: number) => (
+const getNewTime = (state: State, player: Player, timestamp: number) => (
   state.time[player] - (timestamp - state.previousTime)
 );
 
 export const reducer: Reducer<State> = (state = initialState , action): State => {
   switch (action.type) {
     case actionTypes.TOGGLE_CLOCK:
-      if (state.clock === 'initial') {
+      if (state.clock.run === 'initial') {
         return {
           ...state,
-          clock: 'running',
-          playerToMove: oppositePlayer(action.player),
+          clock: {
+            run: 'running',
+            playerToMove: oppositePlayer(action.player),
+          },
           previousTime: action.timestamp,
         };
-      } else if (state.clock === 'running' && action.player === state.playerToMove) {
+      } else if (state.clock.run === 'running' && action.player === state.clock.playerToMove) {
         return {
           ...state,
-          clock: 'running',
-          playerToMove: oppositePlayer(action.player),
+          clock: {
+            run: 'running',
+            playerToMove: oppositePlayer(action.player),
+          },
           previousTime: action.timestamp,
           time: {
             ...state.time,
-            [action.player]: newTime(state, action.player, action.timestamp),
+            [action.player]: getNewTime(state, action.player, action.timestamp),
+          },
+        };
+      } else {
+        return state;
+      }
+
+    case actionTypes.TICK:
+      if (state.clock.run === 'running') {
+        const player = state.clock.playerToMove;
+        const newTime = getNewTime(state, player, action.timestamp);
+        return {
+          ...state,
+          previousTime: action.timestamp,
+          clock: (newTime <= 0) ? {
+            ...state.clock,
+            run: 'ended',
+          } : {
+            ...state.clock,
+            run: 'running',
+          },
+          time: {
+            ...state.time,
+            [player]: newTime,
           },
         };
       } else {
