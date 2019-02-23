@@ -2,12 +2,12 @@ import React from 'react';
 import { Player } from '../../../types';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { playerToMove$, playersTime$ } from '../../../store';
+import { playerToMove$, playersTime$, clock$ } from '../../../store';
 import { State } from '../../../store/state';
 import { toggleClock } from '../../../store/actions';
 import { formattedTime } from '../../../helpers';
 
-export type DialState = 'inactive' | 'active';
+export type DialState = 'inactive' | 'active' | 'ended';
 
 type OwnProps = {
   player: Player,
@@ -38,7 +38,11 @@ const mapState = (state: State, ownProps: OwnProps): StateProps => {
   const player = ownProps.player;
   const playerToMove = playerToMove$(state);
   return {
-    state: (player !== playerToMove) ? 'inactive' : 'active',
+    state: (
+      (player !== playerToMove && 'inactive')
+      || (clock$(state) === 'running' && 'active')
+      || 'ended'
+    ),
     time: playersTime$(state, player),
   };
 }

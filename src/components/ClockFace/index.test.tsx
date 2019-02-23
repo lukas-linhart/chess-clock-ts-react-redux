@@ -6,8 +6,8 @@ import { mount, ReactWrapper } from 'enzyme';
 import { players } from '../../types';
 import { Store } from 'redux';
 import { Provider } from 'react-redux';
-import { createStore, clock$, playerToMove$ } from '../../store';
-import { toggleClock } from '../../store/actions';
+import { createStore, clock$, playerToMove$, playersTime$ } from '../../store';
+import { toggleClock, tick } from '../../store/actions';
 import { oppositePlayer } from '../../helpers';
 
 describe('connected <ClockFace />', () => {
@@ -73,11 +73,30 @@ describe('connected <ClockFace />', () => {
   });
 
   describe('Given the clock is running', () => {
+    let currentTime: number;
+    const getCurrentTime = () => currentTime;
+
     for (let playerToMove of players) {
       describe(`and ${playerToMove} is to move`, () => {
         beforeEach(() => {
-          store.dispatch(toggleClock(oppositePlayer(playerToMove)));
+          currentTime = 0;
+          store.dispatch(toggleClock(oppositePlayer(playerToMove), getCurrentTime));
           clockFace = getMountedComponent();
+        });
+
+        describe('when time runs out', () => {
+          beforeEach(() => {
+            const timeToElapse = playersTime$(store.getState(), playerToMove) + 100;
+            currentTime += timeToElapse;
+            store.dispatch(tick(getCurrentTime));
+            clockFace = getMountedComponent();
+          });
+
+          it(`${playerToMove}'s dial should be ended`, () => {
+            expect(
+              getDialComponent(playerToMove).props().state
+            ).toEqual('ended');
+          });
         });
 
         for (let clickedPlayer of players) {
@@ -102,6 +121,44 @@ describe('connected <ClockFace />', () => {
               expect(
                 getDialComponent(oppositePlayer(playerToMove)).props().state
               ).toEqual(isValidClick() ? 'active' : 'inactive');
+            });
+          });
+        }
+      });
+    }
+  });
+
+  describe('Given the clock is ended', () => {
+    let currentTime: number;
+    const getCurrentTime = () => currentTime;
+
+    for (let playerToMove of players) {
+      describe(`and ${playerToMove} is to move`, () => {
+        beforeEach(() => {
+          currentTime = 0;
+          store.dispatch(toggleClock(oppositePlayer(playerToMove), getCurrentTime));
+          const timeToElapse = playersTime$(store.getState(), playerToMove) + 100;
+          currentTime += timeToElapse;
+          store.dispatch(tick(getCurrentTime));
+          clockFace = getMountedComponent();
+        });
+
+        for (let clickedPlayer of players) {
+          describe(`when ${clickedPlayer}'s dial is clicked`, () => {
+            it('clock should remain ended', () => {
+              expect(clock$(store.getState())).toEqual('ended');
+            });
+
+            it(`${playerToMove}'s dial should remain ended`, () => {
+              expect(
+                getDialComponent(playerToMove).props().state
+              ).toEqual('ended');
+            });
+
+            it(`${oppositePlayer(playerToMove)}'s dial should remain inactive`, () => {
+              expect(
+                getDialComponent(oppositePlayer(playerToMove)).props().state
+              ).toEqual('inactive');
             });
           });
         }
