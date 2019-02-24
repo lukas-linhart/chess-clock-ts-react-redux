@@ -1,5 +1,6 @@
 import React from 'react';
 import ClockDial from './ClockDial';
+import Controls from './Controls';
 import { players } from '../../types';
 
 const ClockFace = () => (
@@ -7,6 +8,7 @@ const ClockFace = () => (
     {players.map(player =>
       <ClockDial key={player} player={player} />
     )}
+    <Controls />
   </div>
 );
 

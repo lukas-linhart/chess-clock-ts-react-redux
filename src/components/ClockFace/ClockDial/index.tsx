@@ -7,7 +7,7 @@ import { State } from '../../../store/state';
 import { toggleClock } from '../../../store/actions';
 import { formattedTime } from '../../../helpers';
 
-export type DialState = 'inactive' | 'active' | 'ended';
+export type DialState = 'inactive' | 'active' | 'ended' | 'paused';
 
 type OwnProps = {
   player: Player,
@@ -41,6 +41,7 @@ const mapState = (state: State, ownProps: OwnProps): StateProps => {
     state: (
       (player !== playerToMove && 'inactive')
       || (clock$(state) === 'running' && 'active')
+      || (clock$(state) === 'paused' && 'paused')
       || 'ended'
     ),
     time: playersTime$(state, player),

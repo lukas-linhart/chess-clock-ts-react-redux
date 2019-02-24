@@ -47,9 +47,25 @@ code {
   background-color: rgb(0, 255, 204);
 }
 
+.clockDial.paused {
+  background-color: rgb(192, 192, 192);
+}
+
 .clockDial.ended {
   background-color: rgb(192, 0, 0);
   color: white;
+}
+
+.controls {
+  grid-area: btn;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.button {
+  filter: drop-shadow(0 0 0.75em rgba(0, 0, 0, 0.5));
 }
 
 @media (orientation: landscape) {
@@ -69,6 +85,10 @@ code {
 
   #player2 {
     grid-area: p2;
+  }
+
+  .pauseButton {
+    width: 20vh;
   }
 }
 
@@ -90,5 +110,9 @@ code {
   #player2 {
     grid-area: p2;
     transform: rotate(180deg);
+  }
+
+  .pauseButton {
+    width: 20vw;
   }
 }

@@ -21,6 +21,15 @@ export const reducer: Reducer<State> = (state = initialState , action): State =>
           },
           previousTime: action.timestamp,
         };
+      } else if (state.clock.run === 'paused' && action.player === oppositePlayer(state.clock.playerToMove)) {
+        return {
+          ...state,
+          clock: {
+            ...state.clock,
+            run: 'running',
+          },
+          previousTime: action.timestamp,
+        };
       } else if (state.clock.run === 'running' && action.player === state.clock.playerToMove) {
         return {
           ...state,
@@ -32,6 +41,25 @@ export const reducer: Reducer<State> = (state = initialState , action): State =>
           time: {
             ...state.time,
             [action.player]: getNewTime(state, action.player, action.timestamp),
+          },
+        };
+      } else {
+        return state;
+      }
+
+    case actionTypes.PAUSE_CLOCK:
+      if (state.clock.run === 'running') {
+        const player = state.clock.playerToMove;
+        return {
+          ...state,
+          clock: {
+            ...state.clock,
+            run: 'paused',
+          },
+          previousTime: action.timestamp,
+          time: {
+            ...state.time,
+            [player]: getNewTime(state, player, action.timestamp),
           },
         };
       } else {

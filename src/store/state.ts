@@ -2,6 +2,7 @@ import { Player } from '../types';
 
 export type ClockState = { run: 'initial' }
   | { run: 'running', playerToMove: Player }
+  | { run: 'paused', playerToMove: Player }
   | { run: 'ended', playerToMove: Player };
 
 export type State = {
