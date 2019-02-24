@@ -5,6 +5,7 @@ import { State, initialState } from './state';
 import { clockTimerSubscription } from './subscriptions';
 
 
+export const view$ = (state: State) => state.view;
 export const clock$ = (state: State) => state.clock.run;
 export const playerToMove$ = (state: State)  => (
   (state.clock.run === 'initial') ? null : state.clock.playerToMove

@@ -1,11 +1,15 @@
 import { Player } from '../types';
+import { INITIAL_TIME } from '../constants';
 
 export type ClockState = { run: 'initial' }
   | { run: 'running', playerToMove: Player }
   | { run: 'paused', playerToMove: Player }
   | { run: 'ended', playerToMove: Player };
 
+export type View = 'clock' | 'resetDialog';
+
 export type State = {
+  view: View,
   clock: ClockState,
   previousTime: number,
   time: {
@@ -15,10 +19,11 @@ export type State = {
 };
 
 export const initialState: State = {
+  view: 'clock',
   clock: { run: 'initial' },
   previousTime: 0,
   time: {
-    player1: 5000,
-    player2: 5000,
+    player1: INITIAL_TIME,
+    player2: INITIAL_TIME,
   },
 };

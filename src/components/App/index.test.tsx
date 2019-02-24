@@ -2,12 +2,15 @@
 import React from 'react';
 import App from '.';
 import { PauseButton } from '../ClockFace/Controls/PauseButton';
+import { ResetButton } from '../ClockFace/Controls/ResetButton';
 import { mount, ReactWrapper } from 'enzyme';
 import { players, Player } from '../../types';
 import { Store } from 'redux';
 import { createStore, clock$, playerToMove$, playersTime$ } from '../../store';
-import { toggleClock, tick, pauseClock } from '../../store/actions';
+import { toggleClock, tick, pauseClock, resetClockPrompt } from '../../store/actions';
 import { oppositePlayer } from '../../helpers';
+
+const RESET_DIALOG_SELECTOR = '#resetDialog';
 
 describe('<App />', () => {
   let store: Store;
@@ -19,7 +22,10 @@ describe('<App />', () => {
   const getDialComponent = (selector: Player) => getDialElem(selector).parent();
   const getDialState = (selector: Player) => getDialComponent(selector).props().state;
   const getPauseButton = () => app.find(PauseButton);
+  const getResetButton = () => app.find(ResetButton);
   const getCurrentTime = () => currentTime;
+  const getResetClockCancelButton = () => app.find('#cancelResetButton');
+  const getResetClockConfirmButton = () => app.find('#confirmResetButton');
 
   beforeEach(() => {
     store = createStore();
@@ -39,6 +45,16 @@ describe('<App />', () => {
       expect(
         getPauseButton().props().isEnabled
       ).toBe(false);
+    });
+
+    it('reset button should be disabled', () => {
+      expect(
+        getResetButton().props().isEnabled
+      ).toBe(false);
+    });
+
+    it('reset dialog should not be rendered', () => {
+      expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(false);
     });
 
     for (let player of players) {
@@ -87,6 +103,12 @@ describe('<App />', () => {
           ).toBe(true);
         });
 
+        it('reset button should be enabled', () => {
+          expect(
+            getResetButton().props().isEnabled
+          ).toBe(true);
+        });
+
         describe('when time runs out', () => {
           beforeEach(() => {
             const timeToElapse = playersTime$(store.getState(), playerToMove) + 100;
@@ -126,6 +148,20 @@ describe('<App />', () => {
           });
         });
 
+        describe('when reset button is clicked', () => {
+          beforeEach(() => {
+            getResetButton().simulate('click');
+          });
+
+          it('clock should be paused', () => {
+            expect(clock$(store.getState())).toEqual('paused');
+          });
+
+          it('reset dialog should be rendered', () => {
+            expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(true);
+          });
+        });
+
         for (let clickedPlayer of players) {
           describe(`when ${clickedPlayer}'s dial is clicked`, () => {
             const isValidClick = () => playerToMove === clickedPlayer;
@@ -158,10 +194,85 @@ describe('<App />', () => {
   describe('Given the clock is paused', () => {
     for (let playerToMove of players) {
       describe(`and ${playerToMove} is to move`, () => {
+        let playersInitialTime: any = {};
         beforeEach(() => {
-          store.dispatch(toggleClock(oppositePlayer(playerToMove)));
-          store.dispatch(pauseClock());
+          for (let player of players) {
+            playersInitialTime[player] = playersTime$(store.getState(), player);
+          }
+          currentTime = 0;
+          store.dispatch(toggleClock(oppositePlayer(playerToMove), getCurrentTime));
+          currentTime += 100;
+          store.dispatch(pauseClock(getCurrentTime));
           app = getApp();
+        });
+
+        it('pause button should be disabled', () => {
+          expect(
+            getPauseButton().props().isEnabled
+          ).toBe(false);
+        });
+
+        it('reset button should be enabled', () => {
+          expect(
+            getResetButton().props().isEnabled
+          ).toBe(true);
+        });
+
+        describe('when reset button is clicked', () => {
+          beforeEach(() => {
+            getResetButton().simulate('click');
+          });
+
+          it('reset dialog should be rendered', () => {
+            expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(true);
+          });
+        });
+
+        describe('and reset dialog is displayed', () => {
+          beforeEach(() => {
+            store.dispatch(resetClockPrompt());
+            app = getApp();
+          });
+
+          describe('when cancel button is clicked', () => {
+            beforeEach(() => {
+              getResetClockCancelButton().simulate('click');
+            });
+
+            it('reset dialog is hidden', () => {
+              expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(false);
+            });
+
+            it('clock remains paused', () => {
+              expect(clock$(store.getState())).toEqual('paused');
+            });
+          });
+
+          describe('when confirm button is clicked', () => {
+            beforeEach(() => {
+              getResetClockConfirmButton().simulate('click');
+            });
+
+            it('reset dialog is hidden', () => {
+              expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(false);
+            });
+
+            it('clock should get reset to initial state', () => {
+              expect(clock$(store.getState())).toEqual('initial');
+            });
+
+            for (let player of players) {
+              it(`${player}'s time should be reset to initial`, () => {
+                expect(
+                  playersTime$(store.getState(), player)
+                ).toEqual(playersInitialTime[player]);
+              });
+
+              it(`${player}'s dial should be inactive`, () => {
+                expect(getDialState(player)).toEqual('inactive');
+              });
+            }
+          });
         });
 
         for (let clickedPlayer of players) {
@@ -189,9 +300,9 @@ describe('<App />', () => {
     }
   });
 
-  describe('Given the clock is ended', () => {
+  describe('Given the clock has run out of time', () => {
     for (let playerToMove of players) {
-      describe(`and ${playerToMove} is to move`, () => {
+      describe(`and ${playerToMove} was to move`, () => {
         beforeEach(() => {
           currentTime = 0;
           store.dispatch(toggleClock(oppositePlayer(playerToMove), getCurrentTime));
@@ -199,6 +310,28 @@ describe('<App />', () => {
           currentTime += timeToElapse;
           store.dispatch(tick(getCurrentTime));
           app = getApp();
+        });
+
+        it('pause button should be disabled', () => {
+          expect(
+            getPauseButton().props().isEnabled
+          ).toBe(false);
+        });
+
+        it('reset button should be enabled', () => {
+          expect(
+            getResetButton().props().isEnabled
+          ).toBe(true);
+        });
+
+        describe('when reset button is clicked', () => {
+          beforeEach(() => {
+            getResetButton().simulate('click');
+          });
+
+          it('reset dialog should be rendered', () => {
+            expect(app.exists(RESET_DIALOG_SELECTOR)).toBe(true);
+          });
         });
 
         for (let clickedPlayer of players) {
