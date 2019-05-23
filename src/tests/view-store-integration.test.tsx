@@ -1,23 +1,23 @@
 /* eslint-disable no-loop-func */
 import React from 'react';
-import App from '.';
-import { PauseButton } from '../ClockFace/Controls/PauseButton';
-import { ResetButton } from '../ClockFace/Controls/ResetButton';
+import View from '../view/View';
+import { PauseButton } from '../view/ClockFace/Controls/PauseButton';
+import { ResetButton } from '../view/ClockFace/Controls/ResetButton';
 import { mount, ReactWrapper } from 'enzyme';
-import { players, Player } from '../../types';
+import { players, Player } from '../types';
 import { Store } from 'redux';
-import { createStore, clock$, playerToMove$, playersTime$ } from '../../store';
-import { toggleClock, tick, pauseClock, resetClockPrompt } from '../../store/actions';
-import { oppositePlayer } from '../../helpers';
+import { createStore, clock$, playerToMove$, playersTime$ } from '../store';
+import { toggleClock, tick, pauseClock, resetClockPrompt } from '../store/actions';
+import { oppositePlayer } from '../helpers';
 
 const RESET_DIALOG_SELECTOR = '#resetDialog';
 
-describe('<App />', () => {
+describe('<View />', () => {
   let store: Store;
   let app: ReactWrapper;
   let currentTime: number;
 
-  const getApp = () => mount(<App store={store} />);
+  const getApp = () => mount(<View store={store} />);
   const getDialElem = (selector: Player) => app.find(`#${selector}`);
   const getDialComponent = (selector: Player) => getDialElem(selector).parent();
   const getDialState = (selector: Player) => getDialComponent(selector).props().state;

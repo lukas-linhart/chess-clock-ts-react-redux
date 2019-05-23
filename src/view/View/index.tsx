@@ -4,13 +4,13 @@ import ResetDialog from '../ResetDialog';
 import { Store } from 'redux';
 import { Provider } from 'react-redux';
 
-const App = ({ store }: { store: Store }) => (
+const View = ({ store }: { store: Store }) => (
   <Provider store={store}>
-    <div className="App">
+    <div className="View">
       <ClockFace />
       <ResetDialog />
     </div>
   </Provider>
 );
 
-export default App;
+export default View;
